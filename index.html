@@ -683,7 +683,7 @@ function renderDashboard(data){
     criticos.length;
 
     renderTable(data);
-
+window.allStocks = data;
 }
 
 function renderTable(data){
@@ -823,6 +823,85 @@ function generateAIInsights(data){
     }
 
 }
+function filterStocks(type){
+
+    document
+    .querySelectorAll(".filter-btn")
+    .forEach(btn=>btn.classList.remove("active"));
+
+    event.target.classList.add("active");
+
+    let filtered = [...window.allStocks];
+
+    const hoje = new Date();
+
+    if(type === "critical"){
+
+        filtered = filtered.filter(item=>{
+
+            const validade =
+            new Date(item.data_validade);
+
+            const dias =
+            Math.floor((validade-hoje)/(1000*60*60*24));
+
+            return dias <= 30;
+
+        });
+
+    }
+
+    if(type === "warning"){
+
+        filtered = filtered.filter(item=>{
+
+            const validade =
+            new Date(item.data_validade);
+
+            const dias =
+            Math.floor((validade-hoje)/(1000*60*60*24));
+
+            return dias > 30 && dias <= 90;
+
+        });
+
+    }
+
+    if(type === "healthy"){
+
+        filtered = filtered.filter(item=>{
+
+            const validade =
+            new Date(item.data_validade);
+
+            const dias =
+            Math.floor((validade-hoje)/(1000*60*60*24));
+
+            return dias > 90;
+
+        });
+
+    }
+
+    if(type === "old"){
+
+        filtered = filtered.filter(item=>{
+
+            const entrada =
+            new Date(item.data_entrada_lote);
+
+            const dias =
+            Math.floor((hoje-entrada)/(1000*60*60*24));
+
+            return dias >= 180;
+
+        });
+
+    }
+
+    renderTable(filtered);
+
+}    
 </script>
 
 </body>
