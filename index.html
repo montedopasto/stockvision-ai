@@ -565,7 +565,17 @@ async function syncGoogleSheets(){
     }
 
 }
+function formatDate(value){
 
+    if(!value) return null;
+
+    const date = new Date(value);
+
+    if(isNaN(date)) return null;
+
+    return date.toISOString().split("T")[0];
+
+}
 function renderDashboard(data){
 
     const totalKg = data.reduce((sum,item)=>sum + Number(item.kg),0);
