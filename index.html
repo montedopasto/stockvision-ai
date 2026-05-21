@@ -202,13 +202,13 @@ letter-spacing:-2px;
     display:grid;
 
     grid-template-columns:
-    420px 1fr;
+    1fr 1fr 1fr;
 
     gap:24px;
 
     margin-top:30px;
 
-    align-items:stretch;
+    align-items:start;
 
 }
 .right-column{
@@ -237,7 +237,7 @@ letter-spacing:-2px;
 
 .chart-card.compact{
 
-    height:420px;
+    height:340px;
 
     display:flex;
 
@@ -253,7 +253,7 @@ letter-spacing:-2px;
 
 .chart-title{
 
-    font-size:20px;
+    font-size:16px;
     font-weight:700;
 
     color:#0f172a;
@@ -266,7 +266,7 @@ letter-spacing:-2px;
 
     color:#64748b;
 
-    font-size:14px;
+    font-size:12px;
 
 }
 
@@ -275,14 +275,14 @@ letter-spacing:-2px;
     flex:1;
 
     position:relative;
-
+max-height:240px;
 }
 
 .ai-center.compact{
 
     margin-top:0;
 
-    flex:1;
+    height:340px;
 
     overflow:auto;
 
@@ -1242,7 +1242,7 @@ document
             responsive:true,
 maintainAspectRatio:false,
             layout:{
-    padding:10
+    padding:0
 },
             plugins:{
 tooltip:{
@@ -1281,7 +1281,7 @@ ${Number(context.raw).toLocaleString("pt-PT")} KG
 
             },
 
-            cutout:"72%"
+            cutout:"78%"
 
         }
 
@@ -1377,10 +1377,10 @@ function renderStatusChart(data){
 
             maintainAspectRatio:false,
 
-            cutout:"72%",
+            cutout:"78%",
 
             layout:{
-                padding:10
+                padding:0
             },
 
             plugins:{
