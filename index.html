@@ -503,20 +503,66 @@ const supabaseClient = supabase.createClient(
     SUPABASE_KEY
 );
 
-async function loadStocks(){
+async function syncGoogleSheets(){
 
-    const { data, error } = await supabaseClient
-    .from("stocks_current")
-    .select("*");
+    try{
 
-    if(error){
+        const url =
+        `https://sheets.googleapis.com/v4/spreadsheets/${GOOGLE_SHEET_ID}/values/STOCKS?key=${GOOGLE_API_KEY}`;
+
+        const response = await fetch(url);
+
+        const result = await response.json();
+
+        const rows = result.values;
+
+        if(!rows || rows.length <= 1){
+
+            console.log("Sem dados.");
+
+            return;
+
+        }
+
+        const dataRows = rows.slice(1);
+
+        const parsed = dataRows.map(row=>({
+
+            codigo_artigo: row[0] || "",
+            nome_produto: row[1] || "",
+            sscc: row[2] || "",
+            lote: row[3] || "",
+            data_entrada_lote: formatDate(row[4]),
+            data_validade: formatDate(row[5]),
+            armazem: row[6] || "",
+            kg: Number(row[7]) || 0
+
+        }));
+
+        await supabaseClient
+        .from("stocks_current")
+        .delete()
+        .neq("codigo_artigo","");
+
+        await supabaseClient
+        .from("stocks_current")
+        .insert(parsed);
+
+        await supabaseClient
+        .from("stocks_history")
+        .insert(parsed);
+
+        renderDashboard(parsed);
+
+        generateAIInsights(parsed);
+
+        console.log("Sync concluído.");
+
+    }catch(error){
 
         console.error(error);
-        return;
 
     }
-
-    renderDashboard(data);
 
 }
 
