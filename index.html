@@ -344,7 +344,39 @@ tbody tr{
 
     background:rgba(19,28,49,0.6);
 
-    transition:0.2s;
+    transition:0.25s;
+
+    border-left:4px solid transparent;
+
+}
+
+tbody tr:hover{
+
+    background:rgba(30,41,59,0.95);
+
+    transform:scale(1.003);
+
+}
+
+tbody tr.critical{
+
+    border-left:4px solid #ef4444;
+
+    background:rgba(239,68,68,0.08);
+
+}
+
+tbody tr.warning{
+
+    border-left:4px solid #f59e0b;
+
+    background:rgba(245,158,11,0.06);
+
+}
+
+tbody tr.old-stock{
+
+    box-shadow:inset 0 0 0 1px rgba(245,158,11,0.2);
 
 }
 
@@ -707,24 +739,36 @@ Math.floor((hoje-entrada)/(1000*60*60*24));
 
         let estado = "green";
         let texto = "Saudável";
+let rowClass = "";
 
+const tempoStock =
+Math.floor((hoje-entrada)/(1000*60*60*24));
+if(tempoStock >= 180){
+
+    rowClass += " old-stock";
+
+}        
         if(diasValidade <= 90){
 
-            estado = "orange";
-            texto = "Atenção";
+    estado = "orange";
+    texto = "Atenção";
 
-        }
+    rowClass += " warning";
+
+}
 
         if(diasValidade <= 30){
 
-            estado = "red";
-            texto = "Crítico";
+    estado = "red";
+    texto = "Crítico";
 
-        }
+    rowClass += " critical";
+
+}
 
         tbody.innerHTML += `
 
-        <tr>
+        <tr class="${rowClass}">
 
             <td>
                 <span class="badge ${estado}">
