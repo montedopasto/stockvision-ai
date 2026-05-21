@@ -129,7 +129,47 @@ linear-gradient(180deg,#f8fafc 0%,#eef2ff 100%);
     letter-spacing:2px;
 
 }
+.header-right{
 
+    display:flex;
+
+    align-items:center;
+
+    gap:18px;
+
+}
+
+.datetime-box{
+
+    display:flex;
+
+    flex-direction:column;
+
+    align-items:flex-end;
+
+    gap:4px;
+
+}
+
+#currentDate{
+
+    font-size:13px;
+
+    color:#64748b;
+
+}
+
+#currentTime{
+
+    font-size:22px;
+
+    font-weight:700;
+
+    color:#0f172a;
+
+    letter-spacing:-1px;
+
+}
 .status{
 
     display:flex;
@@ -633,12 +673,25 @@ tbody tr:hover{
 
 </div>
 
+    <div class="header-right">
+
+    <div class="datetime-box">
+
+        <div id="currentDate"></div>
+
+        <div id="currentTime"></div>
+
+    </div>
+
     <div class="status">
 
         <div class="status-dot"></div>
+
         <span>Sistema Online</span>
 
     </div>
+
+</div>
 
 </div>
 
@@ -1469,7 +1522,41 @@ ${context.raw} lotes
 
     });
 
-}    
+}   
+function updateDateTime(){
+
+    const now = new Date();
+
+    const date =
+    now.toLocaleDateString("pt-PT",{
+
+        weekday:"long",
+        day:"2-digit",
+        month:"long",
+        year:"numeric"
+
+    });
+
+    const time =
+    now.toLocaleTimeString("pt-PT",{
+
+        hour:"2-digit",
+        minute:"2-digit",
+        second:"2-digit"
+
+    });
+
+    document.getElementById("currentDate")
+    .innerText = date;
+
+    document.getElementById("currentTime")
+    .innerText = time;
+
+}
+
+updateDateTime();
+
+setInterval(updateDateTime,1000);    
 </script>
 
 </body>
