@@ -537,6 +537,8 @@ async function syncGoogleSheets(){
             armazem: row[6] || "",
             kg: parseFloat(
     String(row[7])
+    .replace(/\s/g, "")
+    .replace(".", "")
     .replace(",", ".")
     .trim()
 ) || 0
