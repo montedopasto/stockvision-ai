@@ -535,7 +535,11 @@ async function syncGoogleSheets(){
             data_entrada_lote: formatDate(row[4]),
             data_validade: formatDate(row[5]),
             armazem: row[6] || "",
-            kg: Number(row[7]) || 0
+            kg: parseFloat(
+    String(row[7])
+    .replace(",", ".")
+    .trim()
+) || 0
 
         }));
 
