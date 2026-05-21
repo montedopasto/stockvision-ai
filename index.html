@@ -732,17 +732,14 @@ function renderTable(data){
         const hoje = new Date();
 
         const diasValidade =
-        Math.floor((validade-hoje)/(1000*60*60*24));
-
-        const tempoStock =
-Math.floor((hoje-entrada)/(1000*60*60*24));
-
-        let estado = "green";
-        let texto = "Saudável";
-let rowClass = "";
+Math.floor((validade-hoje)/(1000*60*60*24));
 
 const tempoStock =
 Math.floor((hoje-entrada)/(1000*60*60*24));
+
+let estado = "green";
+let texto = "Saudável";
+let rowClass = "";
 if(tempoStock >= 180){
 
     rowClass += " old-stock";
