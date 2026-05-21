@@ -473,7 +473,7 @@ tbody tr:hover{
                     <th>Armazém</th>
                     <th>KG</th>
                     <th>Validade</th>
-                    <th>Aging</th>
+                    <th>Tempo em Stock</th>
 
                 </tr>
 
@@ -632,8 +632,8 @@ function renderTable(data){
         const diasValidade =
         Math.floor((validade-hoje)/(1000*60*60*24));
 
-        const aging =
-        Math.floor((hoje-entrada)/(1000*60*60*24));
+        const tempoStock =
+Math.floor((hoje-entrada)/(1000*60*60*24));
 
         let estado = "green";
         let texto = "Saudável";
