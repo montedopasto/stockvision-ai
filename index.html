@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>StockVision AI</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+
+:root{
+
+    --bg:#0b1120;
+    --panel:#131c31;
+    --panel2:#1a2540;
+
+    --text:#f3f4f6;
+    --muted:#94a3b8;
+
+    --green:#22c55e;
+    --orange:#f59e0b;
+    --red:#ef4444;
+    --blue:#3b82f6;
+
+    --border:rgba(255,255,255,0.06);
+
+}
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+
+    font-family:'Inter',sans-serif;
+    background:linear-gradient(180deg,#0b1120 0%,#111827 100%);
+    color:var(--text);
+
+    min-height:100vh;
+
+}
+
+.header{
+
+    width:100%;
+    padding:24px 32px;
+
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+
+    border-bottom:1px solid var(--border);
+
+    position:sticky;
+    top:0;
+
+    backdrop-filter:blur(12px);
+
+    background:rgba(11,17,32,0.85);
+
+    z-index:1000;
+
+}
+
+.logo{
+
+    display:flex;
+    flex-direction:column;
+    gap:4px;
+
+}
+
+.logo h1{
+
+    font-size:28px;
+    font-weight:700;
+    letter-spacing:-1px;
+
+}
+
+.logo span{
+
+    color:var(--green);
+    font-size:13px;
+    letter-spacing:2px;
+
+}
+
+.status{
+
+    display:flex;
+    align-items:center;
+    gap:12px;
+
+    background:rgba(34,197,94,0.12);
+
+    border:1px solid rgba(34,197,94,0.25);
+
+    padding:10px 16px;
+    border-radius:14px;
+
+}
+
+.status-dot{
+
+    width:10px;
+    height:10px;
+
+    background:var(--green);
+    border-radius:50%;
+
+    box-shadow:0 0 12px var(--green);
+
+}
+
+.main{
+
+    padding:32px;
+
+}
+
+.kpis{
+
+    display:grid;
+
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+
+    gap:20px;
+
+}
+
+.card{
+
+    background:rgba(19,28,49,0.75);
+
+    border:1px solid var(--border);
+
+    border-radius:22px;
+
+    padding:24px;
+
+    backdrop-filter:blur(14px);
+
+    transition:0.3s;
+
+}
+
+.card:hover{
+
+    transform:translateY(-4px);
+
+    border-color:rgba(34,197,94,0.3);
+
+}
+
+.card-label{
+
+    color:var(--muted);
+    font-size:14px;
+
+    margin-bottom:12px;
+
+}
+
+.card-value{
+
+    font-size:38px;
+    font-weight:700;
+
+}
+
+.ai-center{
+
+    margin-top:28px;
+
+    background:linear-gradient(135deg,#13203b 0%,#172554 100%);
+
+    border-radius:24px;
+
+    padding:28px;
+
+    border:1px solid rgba(59,130,246,0.2);
+
+}
+
+.ai-center h2{
+
+    margin-bottom:18px;
+    font-size:24px;
+
+}
+
+.ai-feed{
+
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+
+}
+
+.ai-item{
+
+    background:rgba(255,255,255,0.04);
+
+    border-radius:16px;
+
+    padding:16px;
+
+    border-left:4px solid var(--orange);
+
+}
+
+.table-section{
+
+    margin-top:30px;
+
+}
+
+.table-header{
+
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+
+    margin-bottom:20px;
+
+}
+
+.search{
+
+    width:320px;
+
+    background:rgba(255,255,255,0.05);
+
+    border:1px solid var(--border);
+
+    border-radius:14px;
+
+    padding:14px 18px;
+
+    color:white;
+
+    outline:none;
+
+}
+
+table{
+
+    width:100%;
+    border-collapse:collapse;
+
+    overflow:hidden;
+
+    border-radius:20px;
+
+}
+
+thead{
+
+    background:#172554;
+
+}
+
+th{
+
+    padding:18px;
+    text-align:left;
+
+    font-size:13px;
+    font-weight:600;
+
+    color:#cbd5e1;
+
+}
+
+td{
+
+    padding:18px;
+
+    border-bottom:1px solid rgba(255,255,255,0.05);
+
+}
+
+tbody tr{
+
+    background:rgba(19,28,49,0.6);
+
+    transition:0.2s;
+
+}
+
+tbody tr:hover{
+
+    background:rgba(30,41,59,0.9);
+
+}
+
+.badge{
+
+    padding:8px 12px;
+
+    border-radius:999px;
+
+    font-size:12px;
+    font-weight:600;
+
+}
+
+.badge.green{
+
+    background:rgba(34,197,94,0.15);
+    color:#4ade80;
+
+}
+
+.badge.orange{
+
+    background:rgba(245,158,11,0.15);
+    color:#fbbf24;
+
+}
+
+.badge.red{
+
+    background:rgba(239,68,68,0.15);
+    color:#f87171;
+
+}
+
+@media(max-width:900px){
+
+    .header{
+
+        padding:20px;
+
+        flex-direction:column;
+        gap:16px;
+
+        align-items:flex-start;
+
+    }
+
+    .main{
+
+        padding:20px;
+
+    }
+
+    .table-header{
+
+        flex-direction:column;
+        gap:16px;
+
+        align-items:flex-start;
+
+    }
+
+    .search{
+
+        width:100%;
+
+    }
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="header">
+
+    <div class="logo">
+
+        <h1>StockVision AI</h1>
+        <span>AI FROZEN STOCK INTELLIGENCE</span>
+
+    </div>
+
+    <div class="status">
+
+        <div class="status-dot"></div>
+        <span>Sistema Online</span>
+
+    </div>
+
+</div>
+
+<div class="main">
+
+    <div class="kpis">
+
+        <div class="card">
+
+            <div class="card-label">KG Totais</div>
+            <div class="card-value" id="totalKg">0</div>
+
+        </div>
+
+        <div class="card">
+
+            <div class="card-label">Produtos</div>
+            <div class="card-value" id="totalProdutos">0</div>
+
+        </div>
+
+        <div class="card">
+
+            <div class="card-label">Armazéns</div>
+            <div class="card-value" id="totalArmazens">0</div>
+
+        </div>
+
+        <div class="card">
+
+            <div class="card-label">Lotes Críticos</div>
+            <div class="card-value" id="lotesCriticos">0</div>
+
+        </div>
+
+    </div>
+
+    <div class="ai-center">
+
+        <h2>AI Insights</h2>
+
+        <div class="ai-feed" id="aiFeed">
+
+            <div class="ai-item">
+                Sistema iniciado com sucesso.
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="table-section">
+
+        <div class="table-header">
+
+            <h2>Stock Operacional</h2>
+
+            <input 
+                type="text"
+                class="search"
+                id="searchInput"
+                placeholder="Pesquisar produto, lote ou armazém..."
+            >
+
+        </div>
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>Estado</th>
+                    <th>Produto</th>
+                    <th>Lote</th>
+                    <th>Armazém</th>
+                    <th>KG</th>
+                    <th>Validade</th>
+                    <th>Aging</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody id="stockTable">
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+<script>
+
+const SUPABASE_URL = "COLOCAR_URL_SUPABASE";
+const SUPABASE_KEY = "COLOCAR_CHAVE_SUPABASE";
+
+const supabaseClient = supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+);
+
+async function loadStocks(){
+
+    const { data, error } = await supabaseClient
+    .from("stocks_current")
+    .select("*");
+
+    if(error){
+
+        console.error(error);
+        return;
+
+    }
+
+    renderDashboard(data);
+
+}
+
+function renderDashboard(data){
+
+    const totalKg = data.reduce((sum,item)=>sum + Number(item.kg),0);
+
+    document.getElementById("totalKg").innerText =
+    Math.round(totalKg).toLocaleString("pt-PT");
+
+    document.getElementById("totalProdutos").innerText =
+    data.length;
+
+    const armazens = [...new Set(data.map(i=>i.armazem))];
+
+    document.getElementById("totalArmazens").innerText =
+    armazens.length;
+
+    const criticos = data.filter(item=>{
+
+        const validade = new Date(item.data_validade);
+        const hoje = new Date();
+
+        const dias =
+        Math.floor((validade-hoje)/(1000*60*60*24));
+
+        return dias <= 30;
+
+    });
+
+    document.getElementById("lotesCriticos").innerText =
+    criticos.length;
+
+    renderTable(data);
+
+}
+
+function renderTable(data){
+
+    const tbody = document.getElementById("stockTable");
+
+    tbody.innerHTML = "";
+
+    data.forEach(item=>{
+
+        const validade = new Date(item.data_validade);
+        const entrada = new Date(item.data_entrada_lote);
+
+        const hoje = new Date();
+
+        const diasValidade =
+        Math.floor((validade-hoje)/(1000*60*60*24));
+
+        const aging =
+        Math.floor((hoje-entrada)/(1000*60*60*24));
+
+        let estado = "green";
+        let texto = "Saudável";
+
+        if(diasValidade <= 90){
+
+            estado = "orange";
+            texto = "Atenção";
+
+        }
+
+        if(diasValidade <= 30){
+
+            estado = "red";
+            texto = "Crítico";
+
+        }
+
+        tbody.innerHTML += `
+
+        <tr>
+
+            <td>
+                <span class="badge ${estado}">
+                    ${texto}
+                </span>
+            </td>
+
+            <td>${item.nome_produto}</td>
+
+            <td>${item.lote}</td>
+
+            <td>${item.armazem}</td>
+
+            <td>${Number(item.kg).toLocaleString("pt-PT")} kg</td>
+
+            <td>${item.data_validade}</td>
+
+            <td>${aging} dias</td>
+
+        </tr>
+
+        `;
+
+    });
+
+}
+
+loadStocks();
+
+</script>
+
+</body>
+</html>
