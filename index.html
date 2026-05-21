@@ -447,7 +447,29 @@ tbody tr:hover{
     </div>
 
     <div class="table-section">
+<div class="quick-filters">
 
+    <button class="filter-btn active" onclick="filterStocks('all')">
+        Todos
+    </button>
+
+    <button class="filter-btn" onclick="filterStocks('critical')">
+        🔴 Críticos
+    </button>
+
+    <button class="filter-btn" onclick="filterStocks('warning')">
+        🟠 Atenção
+    </button>
+
+    <button class="filter-btn" onclick="filterStocks('healthy')">
+        🟢 Saudáveis
+    </button>
+
+    <button class="filter-btn" onclick="filterStocks('old')">
+        📉 Tempo Elevado
+    </button>
+
+</div>
         <div class="table-header">
 
             <h2>Stock Operacional</h2>
