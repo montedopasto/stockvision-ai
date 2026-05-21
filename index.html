@@ -1210,7 +1210,22 @@ maintainAspectRatio:false,
     padding:10
 },
             plugins:{
+tooltip:{
 
+    callbacks:{
+
+        label:function(context){
+
+            return `
+${context.label}: 
+${Number(context.raw).toLocaleString("pt-PT")} KG
+`;
+
+        }
+
+    }
+
+},
                 legend:{
 
                     position:"bottom",
