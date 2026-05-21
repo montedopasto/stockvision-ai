@@ -753,6 +753,9 @@ Math.floor((hoje-entrada)/(1000*60*60*24));
 }
 
 syncGoogleSheets();
+document
+.getElementById("searchInput")
+.addEventListener("input", searchStocks);    
 function generateAIInsights(data){
 
     const aiFeed =
@@ -898,6 +901,45 @@ function filterStocks(type){
         });
 
     }
+
+    renderTable(filtered);
+
+} 
+function searchStocks(event){
+
+    const term =
+    event.target.value.toLowerCase();
+
+    const filtered =
+    window.allStocks.filter(item=>{
+
+        return (
+
+            item.nome_produto
+            ?.toLowerCase()
+            .includes(term)
+
+            ||
+
+            item.lote
+            ?.toLowerCase()
+            .includes(term)
+
+            ||
+
+            item.armazem
+            ?.toLowerCase()
+            .includes(term)
+
+            ||
+
+            item.codigo_artigo
+            ?.toLowerCase()
+            .includes(term)
+
+        );
+
+    });
 
     renderTable(filtered);
 
