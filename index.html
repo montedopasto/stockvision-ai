@@ -677,7 +677,76 @@ function renderTable(data){
 }
 
 syncGoogleSheets();
+function generateAIInsights(data){
 
+    const aiFeed =
+    document.getElementById("aiFeed");
+
+    aiFeed.innerHTML = "";
+
+    const hoje = new Date();
+
+    const criticos = data.filter(item=>{
+
+        const validade =
+        new Date(item.data_validade);
+
+        const dias =
+        Math.floor((validade-hoje)/(1000*60*60*24));
+
+        return dias <= 30;
+
+    });
+
+    if(criticos.length){
+
+        aiFeed.innerHTML += `
+
+        <div class="ai-item">
+            ⚠️ ${criticos.length} lotes em risco crítico.
+        </div>
+
+        `;
+
+    }
+
+    const antigos = data.filter(item=>{
+
+        const entrada =
+        new Date(item.data_entrada_lote);
+
+        const dias =
+        Math.floor((hoje-entrada)/(1000*60*60*24));
+
+        return dias >= 180;
+
+    });
+
+    if(antigos.length){
+
+        aiFeed.innerHTML += `
+
+        <div class="ai-item">
+            📉 ${antigos.length} lotes parados há mais de 180 dias.
+        </div>
+
+        `;
+
+    }
+
+    if(!criticos.length && !antigos.length){
+
+        aiFeed.innerHTML += `
+
+        <div class="ai-item">
+            🟢 Sistema operacional saudável.
+        </div>
+
+        `;
+
+    }
+
+}
 </script>
 
 </body>
