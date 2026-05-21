@@ -152,15 +152,30 @@ body{
 
     backdrop-filter:blur(14px);
 
-    transition:0.3s;
+    transition:0.35s;
+
+position:relative;
+
+overflow:hidden;
+
+box-shadow:
+
+0 0 0 rgba(0,0,0,0);
 
 }
 
 .card:hover{
 
-    transform:translateY(-4px);
+    transform:
+    translateY(-6px)
+    scale(1.02);
 
-    border-color:rgba(34,197,94,0.3);
+    border-color:
+    rgba(34,197,94,0.35);
+
+    box-shadow:
+    0 10px 30px rgba(0,0,0,0.35),
+    0 0 25px rgba(34,197,94,0.08);
 
 }
 
@@ -177,7 +192,7 @@ body{
 
     font-size:38px;
     font-weight:700;
-
+letter-spacing:-2px;
 }
 
 .ai-center{
@@ -493,21 +508,27 @@ tbody tr:hover{
 
         <div class="card">
 
-            <div class="card-label">Produtos</div>
+            <div class="card-label">
+    🥩 Produtos
+</div>
             <div class="card-value" id="totalProdutos">0</div>
 
         </div>
 
         <div class="card">
 
-            <div class="card-label">Armazéns</div>
+            <div class="card-label">
+    🏭 Armazéns
+</div>
             <div class="card-value" id="totalArmazens">0</div>
 
         </div>
 
         <div class="card">
 
-            <div class="card-label">Lotes Críticos</div>
+            <div class="card-label">
+    🔴 Lotes Críticos
+</div>
             <div class="card-value" id="lotesCriticos">0</div>
 
         </div>
@@ -715,7 +736,19 @@ function renderDashboard(data){
 
     document.getElementById("lotesCriticos").innerText =
     criticos.length;
+const criticalCard =
+document.getElementById("lotesCriticos")
+.parentElement;
 
+criticalCard.style.borderColor =
+criticos.length > 0
+? "rgba(239,68,68,0.35)"
+: "rgba(255,255,255,0.06)";
+
+criticalCard.style.boxShadow =
+criticos.length > 0
+? "0 0 25px rgba(239,68,68,0.12)"
+: "";
     renderTable(data);
 window.allStocks = data;
 }
