@@ -1098,7 +1098,9 @@ function renderWarehouseChart(data){
     const values = Object.values(totals);
 
     const ctx =
-    document.getElementById("warehouseChart");
+document
+.getElementById("warehouseChart")
+.getContext("2d");
 
     if(warehouseChart){
 
