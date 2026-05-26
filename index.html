@@ -840,24 +840,24 @@ tbody tr:hover{
 <div class="quick-filters">
 
     <button class="filter-btn active" onclick="filterStocks('all')">
-        Todos
-    </button>
+    Todos · <span id="kgAll">0 kg</span>
+</button>
 
-    <button class="filter-btn" onclick="filterStocks('critical')">
-        🔴 Críticos
-    </button>
+<button class="filter-btn" onclick="filterStocks('critical')">
+    🔴 Críticos · <span id="kgCritical">0 kg</span>
+</button>
 
-    <button class="filter-btn" onclick="filterStocks('warning')">
-        🟠 Atenção
-    </button>
+<button class="filter-btn" onclick="filterStocks('warning')">
+    🟠 Atenção · <span id="kgWarning">0 kg</span>
+</button>
 
-    <button class="filter-btn" onclick="filterStocks('healthy')">
-        🟢 Saudáveis
-    </button>
+<button class="filter-btn" onclick="filterStocks('healthy')">
+    🟢 Saudáveis · <span id="kgHealthy">0 kg</span>
+</button>
 
-    <button class="filter-btn" onclick="filterStocks('old')">
-        📉 Tempo Elevado
-    </button>
+<button class="filter-btn" onclick="filterStocks('old')">
+    📉 Tempo Elevado · <span id="kgOld">0 kg</span>
+</button>
 
 </div>
         <div class="table-header">
@@ -997,6 +997,72 @@ function formatDate(value){
     return date.toISOString().split("T")[0];
 
 }
+function updateFilterKgs(data){
+
+    const hoje = new Date();
+
+    let totalAll = 0;
+    let totalCritical = 0;
+    let totalWarning = 0;
+    let totalHealthy = 0;
+    let totalOld = 0;
+
+    data.forEach(item=>{
+
+        const kg = Number(item.kg) || 0;
+
+        totalAll += kg;
+
+        const validade =
+        new Date(item.data_validade);
+
+        const entrada =
+        new Date(item.data_entrada_lote);
+
+        const diasValidade =
+        Math.floor((validade-hoje)/(1000*60*60*24));
+
+        const tempoStock =
+        Math.floor((hoje-entrada)/(1000*60*60*24));
+
+        if(diasValidade <= 30){
+
+            totalCritical += kg;
+
+        }else if(diasValidade <= 90){
+
+            totalWarning += kg;
+
+        }else{
+
+            totalHealthy += kg;
+
+        }
+
+        if(tempoStock >= 180){
+
+            totalOld += kg;
+
+        }
+
+    });
+
+    document.getElementById("kgAll").innerText =
+    Math.round(totalAll).toLocaleString("pt-PT") + " kg";
+
+    document.getElementById("kgCritical").innerText =
+    Math.round(totalCritical).toLocaleString("pt-PT") + " kg";
+
+    document.getElementById("kgWarning").innerText =
+    Math.round(totalWarning).toLocaleString("pt-PT") + " kg";
+
+    document.getElementById("kgHealthy").innerText =
+    Math.round(totalHealthy).toLocaleString("pt-PT") + " kg";
+
+    document.getElementById("kgOld").innerText =
+    Math.round(totalOld).toLocaleString("pt-PT") + " kg";
+
+}    
 function renderDashboard(data){
 
     const totalKg = data.reduce((sum,item)=>sum + Number(item.kg),0);
@@ -1045,6 +1111,7 @@ currentViewStocks = data;
 renderTable(currentViewStocks);
 renderWarehouseChart(data);
 renderStatusChart(data);
+updateFilterKgs(data);    
 }
 
 function renderTable(data){
