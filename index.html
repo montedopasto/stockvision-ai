@@ -275,8 +275,7 @@ letter-spacing:-2px;
 
     display:grid;
 
-    grid-template-columns:
-    1fr 1fr 1fr;
+    grid-template-columns:1fr 1fr;
 
     gap:24px;
 
@@ -340,7 +339,13 @@ letter-spacing:-2px;
     flex:1;
 
     position:relative;
-max-height:240px;
+
+    height:220px;
+
+    max-height:220px;
+
+    overflow:hidden;
+
 }
 
 .ai-center.compact{
@@ -354,7 +359,7 @@ max-height:240px;
     display:flex;
 
     flex-direction:column;
-
+    grid-column:1 / -1;
 }
 .ai-center{
 
