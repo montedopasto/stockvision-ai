@@ -1090,7 +1090,7 @@ if(tempoStock >= 180){
 
             <td>${Number(item.kg).toLocaleString("pt-PT")} kg</td>
 
-            <td>${item.data_validade}</td>
+            <td>${formatDatePT(item.data_validade)}</td>
 
 <td>${diasValidade} dias</td>
 
@@ -1717,6 +1717,15 @@ tempo_stock:"Tempo em Stock"
         }
 
     });
+
+}    
+function formatDatePT(value){
+
+    if(!value) return "";
+
+    const date = new Date(value);
+
+    return date.toLocaleDateString("pt-PT");
 
 }    
 </script>
