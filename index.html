@@ -1563,40 +1563,7 @@ ${context.raw} lotes
     });
 
 }   
-function updateDateTime(){
 
-    const now = new Date();
-
-    const date =
-    now.toLocaleDateString("pt-PT",{
-
-        weekday:"long",
-        day:"2-digit",
-        month:"long",
-        year:"numeric"
-
-    });
-
-    const time =
-    now.toLocaleTimeString("pt-PT",{
-
-        hour:"2-digit",
-        minute:"2-digit",
-        second:"2-digit"
-
-    });
-
-    document.getElementById("currentDate")
-    .innerText = date;
-
-    document.getElementById("currentTime")
-    .innerText = time;
-
-}
-
-updateDateTime();
-
-setInterval(updateDateTime,1000); 
 function updateDateTime(){
 
     const now = new Date();
