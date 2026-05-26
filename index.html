@@ -494,6 +494,7 @@ align-items:center;
 table{
 
     width:100%;
+    table-layout:fixed;
     border-collapse:collapse;
 
     overflow:hidden;
@@ -510,11 +511,11 @@ thead{
 
 th{
 
-    padding:18px;
+    padding:14px 10px;
     text-align:left;
 
-    font-size:13px;
-    font-weight:600;
+    font-size:12px;
+    font-weight:700;
 
     color:#475569;
 
@@ -532,11 +533,15 @@ th:hover{
 
 td{
 
-    padding:18px;
+    padding:14px 10px;
 
     border-bottom:1px solid rgba(255,255,255,0.05);
 
-    white-space:nowrap;
+    white-space:normal;
+    overflow:hidden;
+    text-overflow:ellipsis;
+
+    font-size:13px;
 
 }
 
