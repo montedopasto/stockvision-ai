@@ -536,6 +536,8 @@ td{
 
     border-bottom:1px solid rgba(255,255,255,0.05);
 
+    white-space:nowrap;
+
 }
 
 tbody tr{
@@ -861,6 +863,7 @@ tbody tr:hover{
 <th data-sort="armazem">Armazém</th>
 <th data-sort="kg">KG</th>
 <th data-sort="data_validade">Validade</th>
+<th data-sort="dias_validade">Validade em</th>
 <th data-sort="tempo_stock">Tempo em Stock</th>
 
                 </tr>
@@ -1089,7 +1092,9 @@ if(tempoStock >= 180){
 
             <td>${item.data_validade}</td>
 
-            <td>${tempoStock} dias</td>
+<td>${diasValidade} dias</td>
+
+<td>${tempoStock} dias</td>
 
         </tr>
 
@@ -1631,7 +1636,15 @@ function sortTable(column){
 
             valueA = Number(a.kg);
             valueB = Number(b.kg);
+}else if(column === "dias_validade"){
 
+    valueA = Math.floor(
+        (new Date(a.data_validade) - hoje)/(1000*60*60*24)
+    );
+
+    valueB = Math.floor(
+        (new Date(b.data_validade) - hoje)/(1000*60*60*24)
+    );
         }else if(column === "data_validade"){
 
             valueA = new Date(a.data_validade);
@@ -1689,7 +1702,8 @@ function updateSortIndicators(column){
         armazem:"Armazém",
         kg:"KG",
         data_validade:"Validade",
-        tempo_stock:"Tempo em Stock"
+dias_validade:"Validade em",
+tempo_stock:"Tempo em Stock"
     };
 
     document.querySelectorAll("th").forEach(th=>{
