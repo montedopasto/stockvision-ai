@@ -850,13 +850,13 @@ tbody tr:hover{
 
                 <tr>
 
-                    <th onclick="sortTable('estado')">Estado ⇅</th>
-<th onclick="sortTable('nome_produto')">Produto ⇅</th>
-<th onclick="sortTable('lote')">Lote ⇅</th>
-<th onclick="sortTable('armazem')">Armazém ⇅</th>
-<th onclick="sortTable('kg')">KG ⇅</th>
-<th onclick="sortTable('data_validade')">Validade ⇅</th>
-<th onclick="sortTable('tempo_stock')">Tempo em Stock ⇅</th>
+                    <th data-sort="estado">Estado</th>
+<th data-sort="nome_produto">Produto</th>
+<th data-sort="lote">Lote</th>
+<th data-sort="armazem">Armazém</th>
+<th data-sort="kg">KG</th>
+<th data-sort="data_validade">Validade</th>
+<th data-sort="tempo_stock">Tempo em Stock</th>
 
                 </tr>
 
@@ -887,6 +887,7 @@ const supabaseClient = supabase.createClient(
 );
 let currentSortColumn = null;
 let currentSortDirection = "asc";
+let currentViewStocks = [];
 let currentViewStocks = [];
 async function syncGoogleSheets(){
 
