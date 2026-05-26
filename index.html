@@ -457,6 +457,152 @@ align-items:center;
     border-color:rgba(34,197,94,0.5);
 
 }
+.validity-heatmap-card{
+
+    margin-top:30px;
+
+    background:rgba(255,255,255,0.92);
+
+    border:1px solid rgba(15,23,42,0.06);
+
+    border-radius:28px;
+
+    padding:28px;
+
+    box-shadow:
+    0 4px 20px rgba(15,23,42,0.05);
+
+}
+
+.heatmap-header{
+
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+
+    margin-bottom:22px;
+
+}
+
+.heatmap-header h2{
+
+    font-size:22px;
+    margin-bottom:4px;
+
+}
+
+.heatmap-header p{
+
+    color:#64748b;
+    font-size:14px;
+
+}
+
+.validity-heatmap{
+
+    display:grid;
+
+    grid-template-columns:repeat(12,1fr);
+
+    gap:12px;
+
+}
+
+.heatmap-month{
+
+    min-height:110px;
+
+    border-radius:20px;
+
+    padding:14px;
+
+    background:#f8fafc;
+
+    border:1px solid rgba(15,23,42,0.06);
+
+    display:flex;
+
+    flex-direction:column;
+
+    justify-content:space-between;
+
+}
+
+.heatmap-month-name{
+
+    font-size:12px;
+
+    font-weight:800;
+
+    color:#475569;
+
+    text-transform:uppercase;
+
+}
+
+.heatmap-month-kg{
+
+    font-size:20px;
+
+    font-weight:900;
+
+    color:#0f172a;
+
+    letter-spacing:-1px;
+
+}
+
+.heatmap-month-lotes{
+
+    font-size:12px;
+
+    color:#64748b;
+
+}
+
+.heatmap-low{
+
+    background:rgba(34,197,94,0.10);
+
+    border-color:rgba(34,197,94,0.18);
+
+}
+
+.heatmap-medium{
+
+    background:rgba(245,158,11,0.13);
+
+    border-color:rgba(245,158,11,0.25);
+
+}
+
+.heatmap-high{
+
+    background:rgba(239,68,68,0.13);
+
+    border-color:rgba(239,68,68,0.25);
+
+}
+
+@media(max-width:1200px){
+
+    .validity-heatmap{
+
+        grid-template-columns:repeat(6,1fr);
+
+    }
+
+}
+
+@media(max-width:700px){
+
+    .validity-heatmap{
+
+        grid-template-columns:repeat(2,1fr);
+
+    }
+
+}    
 .executive-grid{
 
     display:grid;
@@ -983,7 +1129,20 @@ tbody tr:hover{
     </div>
 
 </div>
+<div class="validity-heatmap-card">
 
+    <div class="heatmap-header">
+
+        <div>
+            <h2>Heatmap de Validade por Mês</h2>
+            <p>KG previstos a expirar por mês</p>
+        </div>
+
+    </div>
+
+    <div id="validityHeatmap" class="validity-heatmap"></div>
+
+</div>
 <div class="executive-grid">
 
     <div class="executive-card">
@@ -1285,6 +1444,7 @@ renderStatusChart(data);
 updateFilterKgs(data);
 renderExecutiveSummary(data);
 renderCriticalTopList(data);   
+renderValidityHeatmap(data);    
 }
 
 function renderTable(data){
@@ -1998,6 +2158,97 @@ function renderCriticalTopList(data){
     `).join("");
 
 }
+function renderValidityHeatmap(data){
+
+    const container =
+    document.getElementById("validityHeatmap");
+
+    if(!container) return;
+
+    const months = [];
+
+    const now = new Date();
+
+    for(let i = 0; i < 12; i++){
+
+        const date =
+        new Date(now.getFullYear(), now.getMonth() + i, 1);
+
+        const key =
+        `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,"0")}`;
+
+        months.push({
+            key:key,
+            label:date.toLocaleDateString("pt-PT",{
+                month:"short",
+                year:"2-digit"
+            }),
+            kg:0,
+            lotes:0
+        });
+
+    }
+
+    data.forEach(item=>{
+
+        const validade =
+        new Date(item.data_validade);
+
+        if(isNaN(validade)) return;
+
+        const key =
+        `${validade.getFullYear()}-${String(validade.getMonth()+1).padStart(2,"0")}`;
+
+        const month =
+        months.find(m=>m.key === key);
+
+        if(!month) return;
+
+        month.kg += Number(item.kg || 0);
+        month.lotes += 1;
+
+    });
+
+    const maxKg =
+    Math.max(...months.map(m=>m.kg),1);
+
+    container.innerHTML =
+    months.map(month=>{
+
+        const ratio =
+        month.kg / maxKg;
+
+        let cls = "heatmap-low";
+
+        if(ratio >= 0.66){
+            cls = "heatmap-high";
+        }else if(ratio >= 0.33){
+            cls = "heatmap-medium";
+        }
+
+        return `
+
+            <div class="heatmap-month ${cls}">
+
+                <div class="heatmap-month-name">
+                    ${month.label}
+                </div>
+
+                <div class="heatmap-month-kg">
+                    ${Math.round(month.kg).toLocaleString("pt-PT")} kg
+                </div>
+
+                <div class="heatmap-month-lotes">
+                    ${month.lotes} lotes
+                </div>
+
+            </div>
+
+        `;
+
+    }).join("");
+
+}    
 function updateDateTime(){
 
     const now = new Date();
