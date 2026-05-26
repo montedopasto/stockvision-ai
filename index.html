@@ -887,6 +887,7 @@ const supabaseClient = supabase.createClient(
 );
 let currentSortColumn = null;
 let currentSortDirection = "asc";
+let currentViewStocks = [];
 async function syncGoogleSheets(){
 
     try{
@@ -1008,13 +1009,17 @@ criticalCard.style.boxShadow =
 criticos.length > 0
 ? "0 0 25px rgba(239,68,68,0.12)"
 : "";
-    renderTable(data);
-    renderWarehouseChart(data);
-    renderStatusChart(data);
-window.allStocks = data;
+    window.allStocks = data;
+currentViewStocks = data;
+
+renderTable(currentViewStocks);
+renderWarehouseChart(data);
+renderStatusChart(data);
 }
 
 function renderTable(data){
+
+    currentViewStocks = data;
 
     const tbody = document.getElementById("stockTable");
 
@@ -1584,7 +1589,7 @@ function sortTable(column){
 
     const hoje = new Date();
 
-    const sorted = [...window.allStocks].sort((a,b)=>{
+    const sorted = [...currentViewStocks].sort((a,b)=>{
 
         let valueA;
         let valueB;
@@ -1624,6 +1629,7 @@ function sortTable(column){
     });
 
     renderTable(sorted);
+updateSortIndicators(column);
 
 }
 
@@ -1641,6 +1647,39 @@ function getEstadoRank(item){
     if(dias <= 90) return 2;
 
     return 3;
+
+}    
+function updateSortIndicators(column){
+
+    document.querySelectorAll("th").forEach(th=>{
+
+        th.innerText = th.innerText
+        .replace(" ▲","")
+        .replace(" ▼","");
+
+    });
+
+    const headers = {
+        estado:"Estado",
+        nome_produto:"Produto",
+        lote:"Lote",
+        armazem:"Armazém",
+        kg:"KG",
+        data_validade:"Validade",
+        tempo_stock:"Tempo em Stock"
+    };
+
+    document.querySelectorAll("th").forEach(th=>{
+
+        if(th.innerText.includes(headers[column])){
+
+            th.innerText =
+            headers[column] +
+            (currentSortDirection === "asc" ? " ▲" : " ▼");
+
+        }
+
+    });
 
 }    
 </script>
