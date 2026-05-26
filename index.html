@@ -457,6 +457,154 @@ align-items:center;
     border-color:rgba(34,197,94,0.5);
 
 }
+.executive-grid{
+
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:24px;
+
+    margin-top:30px;
+
+}
+
+.executive-card{
+
+    background:rgba(255,255,255,0.92);
+
+    border:1px solid rgba(15,23,42,0.06);
+
+    border-radius:28px;
+
+    padding:28px;
+
+    box-shadow:
+    0 4px 20px rgba(15,23,42,0.05);
+
+}
+
+.executive-card h2{
+
+    font-size:22px;
+    margin-bottom:18px;
+
+}
+
+.executive-summary{
+
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+
+    color:#0f172a;
+
+    font-size:15px;
+    line-height:1.5;
+
+}
+
+.summary-line{
+
+    padding:16px;
+
+    background:#f8fafc;
+
+    border-radius:18px;
+
+    border-left:4px solid #22c55e;
+
+}
+
+.summary-line.warning{
+
+    border-left-color:#f59e0b;
+
+}
+
+.summary-line.danger{
+
+    border-left-color:#ef4444;
+
+}
+
+.critical-top-list{
+
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+
+}
+
+.critical-top-item{
+
+    display:grid;
+    grid-template-columns:32px 1fr auto;
+    gap:12px;
+    align-items:center;
+
+    padding:12px 14px;
+
+    background:#f8fafc;
+
+    border-radius:16px;
+
+}
+
+.critical-rank{
+
+    width:28px;
+    height:28px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    border-radius:999px;
+
+    background:rgba(239,68,68,0.12);
+    color:#ef4444;
+
+    font-weight:800;
+    font-size:12px;
+
+}
+
+.critical-name{
+
+    font-weight:700;
+    color:#0f172a;
+
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+
+}
+
+.critical-meta{
+
+    font-size:12px;
+    color:#64748b;
+    margin-top:3px;
+
+}
+
+.critical-kg{
+
+    font-weight:800;
+    color:#ef4444;
+
+    white-space:nowrap;
+
+}
+
+@media(max-width:1100px){
+
+    .executive-grid{
+
+        grid-template-columns:1fr;
+
+    }
+
+}    
 .table-section{
 
     margin-top:30px;
@@ -836,6 +984,29 @@ tbody tr:hover{
 
 </div>
 
+<div class="executive-grid">
+
+    <div class="executive-card">
+
+        <h2>Resumo Executivo AI</h2>
+
+        <div id="executiveSummary" class="executive-summary">
+            A analisar stock...
+        </div>
+
+    </div>
+
+    <div class="executive-card">
+
+        <h2>Top 10 Produtos Críticos por KG</h2>
+
+        <div id="criticalTopList" class="critical-top-list">
+        </div>
+
+    </div>
+
+</div>
+
     <div class="table-section">
 <div class="quick-filters">
 
@@ -1111,7 +1282,9 @@ currentViewStocks = data;
 renderTable(currentViewStocks);
 renderWarehouseChart(data);
 renderStatusChart(data);
-updateFilterKgs(data);    
+updateFilterKgs(data);
+renderExecutiveSummary(data);
+renderCriticalTopList(data);   
 }
 
 function renderTable(data){
@@ -1640,7 +1813,191 @@ ${context.raw} lotes
     });
 
 }   
+function renderExecutiveSummary(data){
 
+    const container =
+    document.getElementById("executiveSummary");
+
+    if(!container) return;
+
+    const hoje = new Date();
+
+    const totalKg =
+    data.reduce((sum,item)=>sum + Number(item.kg || 0),0);
+
+    const criticalItems =
+    data.filter(item=>{
+
+        const dias =
+        Math.floor((new Date(item.data_validade)-hoje)/(1000*60*60*24));
+
+        return dias <= 30;
+
+    });
+
+    const criticalKg =
+    criticalItems.reduce((sum,item)=>sum + Number(item.kg || 0),0);
+
+    const oldItems =
+    data.filter(item=>{
+
+        const dias =
+        Math.floor((hoje-new Date(item.data_entrada_lote))/(1000*60*60*24));
+
+        return dias >= 180;
+
+    });
+
+    const oldKg =
+    oldItems.reduce((sum,item)=>sum + Number(item.kg || 0),0);
+
+    const armazens = {};
+
+    criticalItems.forEach(item=>{
+
+        const key = item.armazem || "Sem armazém";
+
+        if(!armazens[key]) armazens[key] = 0;
+
+        armazens[key] += Number(item.kg || 0);
+
+    });
+
+    const topArmazem =
+    Object.entries(armazens)
+    .sort((a,b)=>b[1]-a[1])[0];
+
+    let riskLevel = "normal";
+    let riskText = "Stock operacional está controlado.";
+
+    if(criticalKg > 0){
+
+        riskLevel = "danger";
+        riskText =
+        `Existem ${criticalItems.length} lotes críticos, representando ${Math.round(criticalKg).toLocaleString("pt-PT")} kg.`;
+
+    }
+
+    const oldText =
+    oldKg > 0
+    ? `${oldItems.length} lotes estão há mais de 180 dias em stock, representando ${Math.round(oldKg).toLocaleString("pt-PT")} kg.`
+    : "Não existem lotes com tempo em stock superior a 180 dias.";
+
+    const focusText =
+    topArmazem
+    ? `Prioridade operacional: ${topArmazem[0]}, com ${Math.round(topArmazem[1]).toLocaleString("pt-PT")} kg críticos.`
+    : "Sem prioridade crítica por armazém neste momento.";
+
+    container.innerHTML = `
+
+        <div class="summary-line ${riskLevel}">
+            ${riskText}
+        </div>
+
+        <div class="summary-line warning">
+            ${oldText}
+        </div>
+
+        <div class="summary-line">
+            ${focusText}
+        </div>
+
+        <div class="summary-line">
+            Stock total analisado: ${Math.round(totalKg).toLocaleString("pt-PT")} kg.
+        </div>
+
+    `;
+
+}
+
+function renderCriticalTopList(data){
+
+    const container =
+    document.getElementById("criticalTopList");
+
+    if(!container) return;
+
+    const hoje = new Date();
+
+    const grouped = {};
+
+    data.forEach(item=>{
+
+        const validade =
+        new Date(item.data_validade);
+
+        const dias =
+        Math.floor((validade-hoje)/(1000*60*60*24));
+
+        if(dias > 30) return;
+
+        const key =
+        item.nome_produto || "Produto sem nome";
+
+        if(!grouped[key]){
+
+            grouped[key] = {
+                nome:key,
+                kg:0,
+                lotes:0,
+                armazens:new Set()
+            };
+
+        }
+
+        grouped[key].kg += Number(item.kg || 0);
+        grouped[key].lotes += 1;
+        grouped[key].armazens.add(item.armazem || "Sem armazém");
+
+    });
+
+    const top =
+    Object.values(grouped)
+    .sort((a,b)=>b.kg-a.kg)
+    .slice(0,10);
+
+    if(!top.length){
+
+        container.innerHTML = `
+            <div class="summary-line">
+                Não existem produtos críticos neste momento.
+            </div>
+        `;
+
+        return;
+
+    }
+
+    container.innerHTML =
+    top.map((item,index)=>`
+
+        <div class="critical-top-item">
+
+            <div class="critical-rank">
+                ${index + 1}
+            </div>
+
+            <div>
+
+                <div class="critical-name">
+                    ${item.nome}
+                </div>
+
+                <div class="critical-meta">
+                    ${item.lotes} lotes · ${item.armazens.size} armazém(ns)
+                </div>
+
+            </div>
+
+            <div class="critical-kg">
+                ${Math.round(item.kg).toLocaleString("pt-PT")} kg
+            </div>
+
+        </div>
+
+    `).join("");
+
+}
 function updateDateTime(){
 
     const now = new Date();
