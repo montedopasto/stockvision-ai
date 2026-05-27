@@ -1526,8 +1526,14 @@ function renderTable(data){
         const diasValidade =
 Math.floor((validade-hoje)/(1000*60*60*24));
 
-const tempoStock =
-Math.floor((hoje-entrada)/(1000*60*60*24));
+let tempoStock = "-";
+
+if(item.data_entrada_lote){
+
+    tempoStock =
+    Math.floor((hoje-entrada)/(1000*60*60*24));
+
+}
 
 let estado = "green";
 let texto = "Saudável";
@@ -2530,8 +2536,14 @@ function exportCurrentViewToExcel(){
         const diasValidade =
         Math.floor((validade-hoje)/(1000*60*60*24));
 
-        const tempoStock =
-        Math.floor((hoje-entrada)/(1000*60*60*24));
+        let tempoStock = "-";
+
+if(item.data_entrada_lote){
+
+    tempoStock =
+    Math.floor((hoje-entrada)/(1000*60*60*24));
+
+}
 
         let estado = "Saudável";
 
@@ -2561,7 +2573,7 @@ function exportCurrentViewToExcel(){
             "Data Entrada Lote": formatDatePT(item.data_entrada_lote),
             "Data Validade": formatDatePT(item.data_validade),
             "Validade em Dias": diasValidade,
-            "Tempo em Stock": tempoStock
+            "Tempo em Stock": tempoStock === "-" ? "-" : tempoStock
 
         };
 
