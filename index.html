@@ -2235,7 +2235,7 @@ function renderCriticalTopList(data){
     container.innerHTML =
     top.map((item,index)=>`
 
-        <div class="critical-top-item">
+        <div class="critical-top-item" onclick="exportCriticalProductToExcel('${encodeURIComponent(item.nome)}')" style="cursor:pointer;">
 
             <div class="critical-rank">
                 ${index + 1}
@@ -2332,7 +2332,7 @@ function renderValidityHeatmap(data){
 
         return `
 
-            <div class="heatmap-month ${cls}">
+            <div class="heatmap-month ${cls}" onclick="exportHeatmapMonthToExcel('${month.key}')" style="cursor:pointer;">
 
                 <div class="heatmap-month-name">
                     ${month.label}
@@ -2352,7 +2352,7 @@ function renderValidityHeatmap(data){
 
     }).join("");
 
-}    
+}
 function updateDateTime(){
 
     const now = new Date();
@@ -2614,6 +2614,154 @@ function formatDatePT(value){
     const date = new Date(value);
 
     return date.toLocaleDateString("pt-PT");
+
+}    
+function exportHeatmapMonthToExcel(monthKey){
+
+    const data = window.allStocks || [];
+
+    const filtered =
+    data.filter(item=>{
+
+        const validade =
+        new Date(item.data_validade);
+
+        if(isNaN(validade)) return false;
+
+        const key =
+        `${validade.getFullYear()}-${String(validade.getMonth()+1).padStart(2,"0")}`;
+
+        return key === monthKey;
+
+    });
+
+    if(!filtered.length){
+        alert("Não existem dados para este mês.");
+        return;
+    }
+
+    exportStockRowsToExcel(
+        filtered,
+        "Heatmap_" + monthKey
+    );
+
+}
+
+function exportCriticalProductToExcel(encodedProductName){
+
+    const productName =
+    decodeURIComponent(encodedProductName);
+
+    const data = window.allStocks || [];
+
+    const hoje = new Date();
+
+    const filtered =
+    data.filter(item=>{
+
+        const validade =
+        new Date(item.data_validade);
+
+        const dias =
+        Math.floor((validade-hoje)/(1000*60*60*24));
+
+        return (
+            item.nome_produto === productName &&
+            dias >= 0 &&
+            dias <= 60
+        );
+
+    });
+
+    if(!filtered.length){
+        alert("Não existem dados para este produto.");
+        return;
+    }
+
+    exportStockRowsToExcel(
+        filtered,
+        "Top10_" + productName
+        .replace(/[\\/:*?"<>|]/g,"")
+        .slice(0,30)
+    );
+
+}
+
+function exportStockRowsToExcel(rows,filePrefix){
+
+    const hoje = new Date();
+
+    const exportData =
+    rows.map(item=>{
+
+        const validade =
+        new Date(item.data_validade);
+
+        const entrada =
+        new Date(item.data_entrada_lote);
+
+        const diasValidade =
+        Math.floor((validade-hoje)/(1000*60*60*24));
+
+        let tempoStock = "-";
+
+        if(item.data_entrada_lote){
+
+            tempoStock =
+            Math.floor((hoje-entrada)/(1000*60*60*24));
+
+        }
+
+        let estado = "Saudável";
+
+        if(diasValidade < 0){
+
+            estado = "Expirado";
+
+        }else if(diasValidade <= 60){
+
+            estado = "Crítico";
+
+        }else if(diasValidade <= 120){
+
+            estado = "Atenção";
+
+        }
+
+        return {
+
+            "Estado": estado,
+            "Código Artigo": item.codigo_artigo || "",
+            "Produto": item.nome_produto || "",
+            "SSCC": item.sscc || "",
+            "Lote": item.lote || "",
+            "Armazém": item.armazem || "",
+            "KG": Number(item.kg || 0),
+            "Data Entrada Lote": formatDatePT(item.data_entrada_lote),
+            "Data Validade": formatDatePT(item.data_validade),
+            "Validade em Dias": diasValidade,
+            "Tempo em Stock": tempoStock === "-" ? "-" : tempoStock
+
+        };
+
+    });
+
+    const worksheet =
+    XLSX.utils.json_to_sheet(exportData);
+
+    const workbook =
+    XLSX.utils.book_new();
+
+    XLSX.utils.book_append_sheet(
+        workbook,
+        worksheet,
+        "Dados"
+    );
+
+    XLSX.writeFile(
+        workbook,
+        filePrefix + ".xlsx"
+    );
 
 }    
 </script>
