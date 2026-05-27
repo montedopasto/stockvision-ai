@@ -1172,7 +1172,9 @@ tbody tr:hover{
     <button class="filter-btn active" onclick="filterStocks('all')">
     Todos · <span id="kgAll">0 kg</span>
 </button>
-
+<button class="filter-btn" onclick="filterStocks('expired')">
+    ⛔ Expirados · <span id="kgExpired">0 kg</span>
+</button>
 <button class="filter-btn" onclick="filterStocks('critical')">
     🔴 Críticos · <span id="kgCritical">0 kg</span>
 </button>
@@ -1332,6 +1334,7 @@ function updateFilterKgs(data){
     const hoje = new Date();
 
     let totalAll = 0;
+    let totalExpired = 0;
     let totalCritical = 0;
     let totalWarning = 0;
     let totalHealthy = 0;
@@ -1355,19 +1358,23 @@ function updateFilterKgs(data){
         const tempoStock =
         Math.floor((hoje-entrada)/(1000*60*60*24));
 
-        if(diasValidade <= 30){
+        if(diasValidade < 0){
 
-            totalCritical += kg;
+    totalExpired += kg;
 
-        }else if(diasValidade <= 90){
+}else if(diasValidade <= 60){
 
-            totalWarning += kg;
+    totalCritical += kg;
 
-        }else{
+}else if(diasValidade <= 120){
 
-            totalHealthy += kg;
+    totalWarning += kg;
 
-        }
+}else{
+
+    totalHealthy += kg;
+
+}
 
         if(tempoStock >= 180){
 
@@ -1379,7 +1386,8 @@ function updateFilterKgs(data){
 
     document.getElementById("kgAll").innerText =
     Math.round(totalAll).toLocaleString("pt-PT") + " kg";
-
+document.getElementById("kgExpired").innerText =
+Math.round(totalExpired).toLocaleString("pt-PT") + " kg";
     document.getElementById("kgCritical").innerText =
     Math.round(totalCritical).toLocaleString("pt-PT") + " kg";
 
@@ -1476,21 +1484,26 @@ if(tempoStock >= 180){
     rowClass += " old-stock";
 
 }        
-        if(diasValidade <= 90){
+        if(diasValidade < 0){
 
-    estado = "orange";
-    texto = "Atenção";
+    estado = "red";
+    texto = "Expirado";
 
-    rowClass += " warning";
+    rowClass += " critical";
 
-}
-
-        if(diasValidade <= 30){
+}else if(diasValidade <= 60){
 
     estado = "red";
     texto = "Crítico";
 
     rowClass += " critical";
+
+}else if(diasValidade <= 120){
+
+    estado = "orange";
+    texto = "Atenção";
+
+    rowClass += " warning";
 
 }
 
@@ -1615,53 +1628,71 @@ function filterStocks(type){
 
     const hoje = new Date();
 
-    if(type === "critical"){
+    if(type === "expired"){
 
-        filtered = filtered.filter(item=>{
+    filtered = filtered.filter(item=>{
 
-            const validade =
-            new Date(item.data_validade);
+        const validade =
+        new Date(item.data_validade);
 
-            const dias =
-            Math.floor((validade-hoje)/(1000*60*60*24));
+        const dias =
+        Math.floor((validade-hoje)/(1000*60*60*24));
 
-            return dias <= 30;
+        return dias < 0;
 
-        });
+    });
+
+}
+
+if(type === "critical"){
+
+    filtered = filtered.filter(item=>{
+
+        const validade =
+        new Date(item.data_validade);
+
+        const dias =
+        Math.floor((validade-hoje)/(1000*60*60*24));
+
+        return dias >= 0 && dias <= 60;
+
+    });
+
+}
 
     }
 
     if(type === "warning"){
 
-        filtered = filtered.filter(item=>{
+    filtered = filtered.filter(item=>{
 
-            const validade =
-            new Date(item.data_validade);
+        const validade =
+        new Date(item.data_validade);
 
-            const dias =
-            Math.floor((validade-hoje)/(1000*60*60*24));
+        const dias =
+        Math.floor((validade-hoje)/(1000*60*60*24));
 
-            return dias > 30 && dias <= 90;
+        return dias > 60 && dias <= 120;
 
-        });
+    });
 
-    }
+}
 
     if(type === "healthy"){
 
-        filtered = filtered.filter(item=>{
+    filtered = filtered.filter(item=>{
 
-            const validade =
-            new Date(item.data_validade);
+        const validade =
+        new Date(item.data_validade);
 
-            const dias =
-            Math.floor((validade-hoje)/(1000*60*60*24));
+        const dias =
+        Math.floor((validade-hoje)/(1000*60*60*24));
 
-            return dias > 90;
+        return dias > 120;
 
-        });
+    });
 
-    }
+}
 
     if(type === "old"){
 
@@ -1837,9 +1868,10 @@ let statusChart;
 
 function renderStatusChart(data){
 
-    let critical = 0;
-    let warning = 0;
-    let healthy = 0;
+  let expired = 0;
+let critical = 0;
+let warning = 0;
+let healthy = 0;
 
     const hoje = new Date();
 
@@ -1851,19 +1883,23 @@ function renderStatusChart(data){
         const dias =
         Math.floor((validade-hoje)/(1000*60*60*24));
 
-        if(dias <= 30){
+        if(dias < 0){
 
-            critical++;
+    expired++;
 
-        }else if(dias <= 90){
+}else if(dias <= 60){
 
-            warning++;
+    critical++;
 
-        }else{
+}else if(dias <= 120){
 
-            healthy++;
+    warning++;
 
-        }
+}else{
+
+    healthy++;
+
+}
 
     });
 
@@ -1884,31 +1920,34 @@ function renderStatusChart(data){
 
         data:{
 
-            labels:[
+           labels:[
 
-                "Críticos",
-                "Atenção",
-                "Saudáveis"
+    "Expirados",
+    "Críticos",
+    "Atenção",
+    "Saudáveis"
 
-            ],
+],
 
             datasets:[{
 
                 data:[
 
-                    critical,
-                    warning,
-                    healthy
+    expired,
+    critical,
+    warning,
+    healthy
 
-                ],
+],
 
                 backgroundColor:[
 
-                    "#ef4444",
-                    "#f59e0b",
-                    "#22c55e"
+    "#7f1d1d",
+    "#ef4444",
+    "#f59e0b",
+    "#22c55e"
 
-                ],
+],
 
                 borderWidth:0
 
