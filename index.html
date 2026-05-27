@@ -15,6 +15,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>    
 <style>
 
 :root{
@@ -766,7 +767,45 @@ align-items:center;
     margin-bottom:20px;
 
 }
+.table-actions{
 
+    display:flex;
+    align-items:center;
+    gap:12px;
+
+}
+
+.export-btn{
+
+    border:none;
+
+    background:linear-gradient(135deg,#16a34a,#22c55e);
+
+    color:white;
+
+    padding:14px 18px;
+
+    border-radius:14px;
+
+    font-weight:800;
+
+    cursor:pointer;
+
+    box-shadow:
+    0 8px 20px rgba(34,197,94,0.22);
+
+    transition:0.25s;
+
+}
+
+.export-btn:hover{
+
+    transform:translateY(-2px);
+
+    box-shadow:
+    0 12px 28px rgba(34,197,94,0.30);
+
+}
 .search{
 
     width:320px;
@@ -1196,12 +1235,20 @@ tbody tr:hover{
 
             <h2>Stock Operacional</h2>
 
-            <input 
-                type="text"
-                class="search"
-                id="searchInput"
-                placeholder="Pesquisar produto, lote ou armazém..."
-            >
+            <div class="table-actions">
+
+    <button class="export-btn" onclick="exportCurrentViewToExcel()">
+        📤 Exportar Excel
+    </button>
+
+    <input 
+        type="text"
+        class="search"
+        id="searchInput"
+        placeholder="Pesquisar produto, lote ou armazém..."
+    >
+
+</div>
 
         </div>
 
@@ -2451,6 +2498,87 @@ tempo_stock:"Tempo em Stock"
         }
 
     });
+
+}    
+function exportCurrentViewToExcel(){
+
+    if(!currentViewStocks || !currentViewStocks.length){
+
+        alert("Não existem dados para exportar.");
+
+        return;
+
+    }
+
+    const hoje = new Date();
+
+    const exportData =
+    currentViewStocks.map(item=>{
+
+        const validade =
+        new Date(item.data_validade);
+
+        const entrada =
+        new Date(item.data_entrada_lote);
+
+        const diasValidade =
+        Math.floor((validade-hoje)/(1000*60*60*24));
+
+        const tempoStock =
+        Math.floor((hoje-entrada)/(1000*60*60*24));
+
+        let estado = "Saudável";
+
+        if(diasValidade < 0){
+
+            estado = "Expirado";
+
+        }else if(diasValidade <= 60){
+
+            estado = "Crítico";
+
+        }else if(diasValidade <= 120){
+
+            estado = "Atenção";
+
+        }
+
+        return {
+
+            "Estado": estado,
+            "Código Artigo": item.codigo_artigo || "",
+            "Produto": item.nome_produto || "",
+            "SSCC": item.sscc || "",
+            "Lote": item.lote || "",
+            "Armazém": item.armazem || "",
+            "KG": Number(item.kg || 0),
+            "Data Entrada Lote": formatDatePT(item.data_entrada_lote),
+            "Data Validade": formatDatePT(item.data_validade),
+            "Validade em Dias": diasValidade,
+            "Tempo em Stock": tempoStock
+
+        };
+
+    });
+
+    const worksheet =
+    XLSX.utils.json_to_sheet(exportData);
+
+    const workbook =
+    XLSX.utils.book_new();
+
+    XLSX.utils.book_append_sheet(
+        workbook,
+        worksheet,
+        "Stock Filtrado"
+    );
+
+    const fileName =
+    "StockVision_AI_" +
+    new Date().toISOString().slice(0,10) +
+    ".xlsx";
+
+    XLSX.writeFile(workbook,fileName);
 
 }    
 function formatDatePT(value){
