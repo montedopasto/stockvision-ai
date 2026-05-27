@@ -32,7 +32,7 @@
     --orange:#f59e0b;
     --red:#ef4444;
     --blue:#3b82f6;
-
+    --critical:#3b82f6;
     --border:rgba(15,23,42,0.06);
 
 }
@@ -972,6 +972,12 @@ tbody tr:hover{
     color:#f87171;
 
 }
+.badge.blue{
+
+    background:rgba(59,130,246,0.15);
+    color:#3b82f6;
+
+}    
 @media(max-width:1100px){
 
     .middle-grid{
@@ -1215,7 +1221,7 @@ tbody tr:hover{
     ⛔ Expirados · <span id="kgExpired">0 kg</span>
 </button>
 <button class="filter-btn" onclick="filterStocks('critical')">
-    🔴 Críticos · <span id="kgCritical">0 kg</span>
+    🔵 Críticos · <span id="kgCritical">0 kg</span>
 </button>
 
 <button class="filter-btn" onclick="filterStocks('warning')">
@@ -1552,7 +1558,7 @@ if(tempoStock !== "-" && tempoStock >= 180){
 
 }else if(diasValidade <= 60){
 
-    estado = "red";
+    estado = "blue";
     texto = "Crítico";
 
     rowClass += " critical";
@@ -1997,10 +2003,10 @@ let healthy = 0;
 
 ],
 
-                backgroundColor:[
+backgroundColor:[
 
-    "#7f1d1d",
     "#ef4444",
+    "#3b82f6",
     "#f59e0b",
     "#22c55e"
 
