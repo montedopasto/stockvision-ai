@@ -1402,8 +1402,14 @@ function updateFilterKgs(data){
         const diasValidade =
         Math.floor((validade-hoje)/(1000*60*60*24));
 
-        const tempoStock =
-        Math.floor((hoje-entrada)/(1000*60*60*24));
+        let tempoStock = "-";
+
+if(item.data_entrada_lote){
+
+    tempoStock =
+    Math.floor((hoje-entrada)/(1000*60*60*24));
+
+}
 
         if(diasValidade < 0){
 
@@ -1526,11 +1532,11 @@ Math.floor((hoje-entrada)/(1000*60*60*24));
 let estado = "green";
 let texto = "Saudável";
 let rowClass = "";
-if(tempoStock >= 180){
+if(tempoStock !== "-" && tempoStock >= 180){
 
     rowClass += " old-stock";
 
-}        
+}     
         if(diasValidade < 0){
 
     estado = "red";
@@ -1576,7 +1582,7 @@ if(tempoStock >= 180){
 
 <td>${diasValidade} dias</td>
 
-<td>${tempoStock} dias</td>
+<td>${tempoStock === "-" ? "-" : tempoStock + " dias"}</td>
 
         </tr>
 
