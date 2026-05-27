@@ -1418,15 +1418,15 @@ function renderDashboard(data){
 
     const criticos = data.filter(item=>{
 
-        const validade = new Date(item.data_validade);
-        const hoje = new Date();
+    const validade = new Date(item.data_validade);
+    const hoje = new Date();
 
-        const dias =
-        Math.floor((validade-hoje)/(1000*60*60*24));
+    const dias =
+    Math.floor((validade-hoje)/(1000*60*60*24));
 
-        return dias <= 30;
+    return dias >= 0 && dias <= 60;
 
-    });
+});
 
     document.getElementById("lotesCriticos").innerText =
     criticos.length;
@@ -1563,7 +1563,7 @@ function generateAIInsights(data){
         const dias =
         Math.floor((validade-hoje)/(1000*60*60*24));
 
-        return dias <= 30;
+        return dias >= 0 && dias <= 60;
 
     });
 
@@ -2128,7 +2128,7 @@ function renderCriticalTopList(data){
         const dias =
         Math.floor((validade-hoje)/(1000*60*60*24));
 
-        if(dias > 30) return;
+        if(dias < 0 || dias > 60) return;
 
         const key =
         item.nome_produto || "Produto sem nome";
