@@ -1933,14 +1933,16 @@ let statusChart;
 
 function renderStatusChart(data){
 
-  let expired = 0;
-let critical = 0;
-let warning = 0;
-let healthy = 0;
+    let expired = 0;
+    let critical = 0;
+    let warning = 0;
+    let healthy = 0;
 
     const hoje = new Date();
 
     data.forEach(item=>{
+
+        const kg = Number(item.kg) || 0;
 
         const validade =
         new Date(item.data_validade);
@@ -1950,21 +1952,21 @@ let healthy = 0;
 
         if(dias < 0){
 
-    expired++;
+            expired += kg;
 
-}else if(dias <= 60){
+        }else if(dias <= 60){
 
-    critical++;
+            critical += kg;
 
-}else if(dias <= 120){
+        }else if(dias <= 120){
 
-    warning++;
+            warning += kg;
 
-}else{
+        }else{
 
-    healthy++;
+            healthy += kg;
 
-}
+        }
 
     });
 
@@ -1985,34 +1987,28 @@ let healthy = 0;
 
         data:{
 
-           labels:[
-
-    "Expirados",
-    "Críticos",
-    "Atenção",
-    "Saudáveis"
-
-],
+            labels:[
+                "Expirados",
+                "Críticos",
+                "Atenção",
+                "Saudáveis"
+            ],
 
             datasets:[{
 
                 data:[
+                    expired,
+                    critical,
+                    warning,
+                    healthy
+                ],
 
-    expired,
-    critical,
-    warning,
-    healthy
-
-],
-
-backgroundColor:[
-
-    "#ef4444",
-    "#3b82f6",
-    "#f59e0b",
-    "#22c55e"
-
-],
+                backgroundColor:[
+                    "#ef4444",
+                    "#3b82f6",
+                    "#f59e0b",
+                    "#22c55e"
+                ],
 
                 borderWidth:0
 
@@ -2023,14 +2019,8 @@ backgroundColor:[
         options:{
 
             responsive:true,
-
             maintainAspectRatio:false,
-
             cutout:"78%",
-
-            layout:{
-                padding:0
-            },
 
             plugins:{
 
@@ -2040,10 +2030,9 @@ backgroundColor:[
 
                         label:function(context){
 
-                            return `
-${context.label}: 
-${context.raw} lotes
-`;
+                            return context.label + ": " +
+                            Number(context.raw).toLocaleString("pt-PT") +
+                            " kg";
 
                         }
 
@@ -2058,7 +2047,6 @@ ${context.raw} lotes
                     labels:{
 
                         color:"#475569",
-
                         padding:20,
 
                         font:{
@@ -2076,7 +2064,7 @@ ${context.raw} lotes
 
     });
 
-}   
+}
 function renderExecutiveSummary(data){
 
     const container =
